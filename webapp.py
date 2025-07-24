@@ -1,5 +1,6 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+import json
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
 from src.utils.file_counter import cloc_stat_in_dirs
@@ -8,7 +9,22 @@ from src.main import find_pods_dir, collect_main_second_level_folders, collect_p
 app = Flask(__name__)
 app.secret_key = 'xcodecodestats2025'
 
+
 CODE_EXTS = ['.swift', '.m', '.mm', '.h', '.c', '.cpp', '.py', '.java', '.js', '.ts']
+
+LANGUAGES = [
+    ('zh_cn', '简体中文'),
+    ('zh_tw', '繁體中文'),
+    ('en', 'English'),
+    ('de', 'Deutsch'),
+    ('fr', 'Français'),
+    ('hi', 'हिन्दी')
+]
+
+def load_lang(lang_code):
+    with open('lang.json', 'r', encoding='utf-8') as f:
+        langs = json.load(f)
+    return langs.get(lang_code, langs['en'])
 
 def get_stats(project_path):
     pods_dir = find_pods_dir(project_path)
@@ -35,15 +51,35 @@ def get_stats(project_path):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
+        if 'lang' in request.form:
+            session['lang'] = request.form.get('lang', 'zh_cn')
+        lang = session.get('lang', 'zh_cn')
+        texts = load_lang(lang)
+        if 'lang' in request.form:
+            project_path = request.form.get('project_path', '').strip()
+            if project_path:
+                if not os.path.isdir(project_path):
+                    flash(texts.get('invalid_path', '提供的路径无效，请检查后重试。'))
+                    return redirect(url_for('index'))
+                main_results, pod_results, main_total, pod_total, total_code = get_stats(project_path)
+                return render_template('result.html', project_path=project_path,
+                                       main_results=main_results, pod_results=pod_results,
+                                       main_total=main_total, pod_total=pod_total, total_code=total_code,
+                                       texts=texts, lang=lang, languages=LANGUAGES)
+            return redirect(url_for('index'))
         project_path = request.form.get('project_path', '').strip()
         if not os.path.isdir(project_path):
-            flash('提供的路径无效，请检查后重试。')
+            flash(texts.get('invalid_path', '提供的路径无效，请检查后重试。'))
             return redirect(url_for('index'))
         main_results, pod_results, main_total, pod_total, total_code = get_stats(project_path)
         return render_template('result.html', project_path=project_path,
                                main_results=main_results, pod_results=pod_results,
-                               main_total=main_total, pod_total=pod_total, total_code=total_code)
-    return render_template('index.html')
+                               main_total=main_total, pod_total=pod_total, total_code=total_code,
+                               texts=texts, lang=lang, languages=LANGUAGES)
+    else:
+        lang = session.get('lang', 'zh_cn')
+        texts = load_lang(lang)
+        return render_template('index.html', texts=texts, lang=lang, languages=LANGUAGES)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -5,16 +5,39 @@
     <title>统计结果 - Xcode代码统计</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body>
-<div class="container mt-5">
-    <h2>Xcode 项目统计结果</h2>
-    <p><b>项目路径：</b>{{ project_path }}</p>
-    <h4 class="mt-4">主项目各目录统计</h4>
+<body style="background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%); min-height:100vh;">
+<div class="container d-flex justify-content-center align-items-center" style="min-height:100vh;">
+  <div class="card shadow-lg p-4 w-100" style="max-width: 1200px; border-radius: 1.5rem; background: rgba(255,255,255,0.97);">
+    <form method="post" action="/" class="mb-3">
+      <input type="hidden" name="project_path" value="{{ project_path }}">
+      <div class="d-flex align-items-center mb-2">
+        <label for="lang" class="form-label me-2 fw-bold">🌐</label>
+        <select name="lang" id="lang" class="form-select form-select-sm w-auto rounded-pill border-0 shadow-sm" style="background:#f0f4fa;" onchange="this.form.submit()">
+          {% for code, name in languages %}
+            <option value="{{ code }}" {% if lang == code %}selected{% endif %}>{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </form>
+    <div class="text-center mb-4">
+      <img src="https://img.icons8.com/color/96/000000/xcode.png" alt="Xcode Icon" style="width:64px; margin-bottom:10px;">
+      <h2 class="mb-2 fw-bold" style="letter-spacing:1px;">{{ texts.result }}</h2>
+    </div>
+    <p><b>{{ texts.project_path if texts.project_path else '项目路径' }}：</b>{{ project_path }}</p>
+    <h4 class="mt-4">{{ texts.main_stats if texts.main_stats else '主项目各目录统计' }}</h4>
     <style>
     .tree-indent { display: inline-block; }
     </style>
-    <table class="table table-bordered table-sm">
-        <thead><tr><th>目录</th><th>类型</th><th>文件数</th><th>总行数</th><th>空行</th><th>注释行</th><th>代码行</th></tr></thead>
+    <table class="table table-bordered table-sm rounded shadow-sm" style="background:#f8fbff;">
+        <thead><tr>
+          <th>{{ texts.folder if texts.folder else '目录' }}</th>
+          <th>{{ texts.type if texts.type else '类型' }}</th>
+          <th>{{ texts.file_count if texts.file_count else '文件数' }}</th>
+          <th>{{ texts.total_lines if texts.total_lines else '总行数' }}</th>
+          <th>{{ texts.blank if texts.blank else '空行' }}</th>
+          <th>{{ texts.comment if texts.comment else '注释行' }}</th>
+          <th>{{ texts.code if texts.code else '代码行' }}</th>
+        </tr></thead>
         <tbody>
         {% for folder in main_results %}
             {% set indent = folder.rel_path.count('/') %}
@@ -38,10 +61,18 @@
         {% endfor %}
         </tbody>
     </table>
-    <h5>主项目总代码行数：{{ main_total }}</h5>
-    <h4 class="mt-4">Pod（三方库）各库统计</h4>
-    <table class="table table-bordered table-sm">
-        <thead><tr><th>库名</th><th>类型</th><th>文件数</th><th>总行数</th><th>空行</th><th>注释行</th><th>代码行</th></tr></thead>
+    <h5>{{ texts.main_total if texts.main_total else '主项目总代码行数' }}：{{ main_total }}</h5>
+    <h4 class="mt-4">{{ texts.pod_stats if texts.pod_stats else 'Pod（三方库）各库统计' }}</h4>
+    <table class="table table-bordered table-sm rounded shadow-sm" style="background:#f8fbff;">
+        <thead><tr>
+          <th>{{ texts.pod_name if texts.pod_name else '库名' }}</th>
+          <th>{{ texts.type if texts.type else '类型' }}</th>
+          <th>{{ texts.file_count if texts.file_count else '文件数' }}</th>
+          <th>{{ texts.total_lines if texts.total_lines else '总行数' }}</th>
+          <th>{{ texts.blank if texts.blank else '空行' }}</th>
+          <th>{{ texts.comment if texts.comment else '注释行' }}</th>
+          <th>{{ texts.code if texts.code else '代码行' }}</th>
+        </tr></thead>
         <tbody>
         {% for pod in pod_results %}
             {% for ext, s in pod.stats.items() if s.files > 0 %}
@@ -58,13 +89,14 @@
         {% endfor %}
         </tbody>
     </table>
-    <h5>Pod总代码行数：{{ pod_total }}</h5>
-    <h4 class="mt-4">占比</h4>
+    <h5>{{ texts.pod_total if texts.pod_total else 'Pod总代码行数' }}：{{ pod_total }}</h5>
+    <h4 class="mt-4">{{ texts.ratio if texts.ratio else '占比' }}</h4>
     <ul>
-        <li>主项目占比：{{ '%.2f' % (main_total / total_code * 100) if total_code else 0 }}%</li>
-        <li>Pod（三方库）占比：{{ '%.2f' % (pod_total / total_code * 100) if total_code else 0 }}%</li>
+        <li>{{ texts.main_ratio if texts.main_ratio else '主项目占比' }}：{{ '%.2f' % (main_total / total_code * 100) if total_code else 0 }}%</li>
+        <li>{{ texts.pod_ratio if texts.pod_ratio else 'Pod（三方库）占比' }}：{{ '%.2f' % (pod_total / total_code * 100) if total_code else 0 }}%</li>
     </ul>
-    <a href="/" class="btn btn-secondary mt-3">返回</a>
+    <a href="/" class="btn btn-primary mt-3 rounded-pill shadow fw-bold" style="background: linear-gradient(90deg,#6a93cb,#a4bfef); border:none;">{{ texts.back if texts.back else '返回' }}</a>
+  </div>
 </div>
 </body>
 </html>
