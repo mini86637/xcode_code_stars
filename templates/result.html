@@ -10,13 +10,26 @@
   <div class="card shadow-lg p-4 w-100" style="max-width: 1200px; border-radius: 1.5rem; background: rgba(255,255,255,0.97);">
     <form method="post" action="/" class="mb-3">
       <input type="hidden" name="project_path" value="{{ project_path }}">
-      <div class="d-flex align-items-center mb-2">
-        <label for="lang" class="form-label me-2 fw-bold">🌐</label>
-        <select name="lang" id="lang" class="form-select form-select-sm w-auto rounded-pill border-0 shadow-sm" style="background:#f0f4fa;" onchange="this.form.submit()">
-          {% for code, name in languages %}
-            <option value="{{ code }}" {% if lang == code %}selected{% endif %}>{{ name }}</option>
-          {% endfor %}
-        </select>
+      <div class="row mb-2">
+        <div class="col-auto d-flex align-items-center">
+          <label for="lang" class="form-label me-2 fw-bold">🌐</label>
+          <select name="lang" id="lang" class="form-select form-select-sm w-auto rounded-pill border-0 shadow-sm" style="background:#f0f4fa;" onchange="this.form.submit()">
+            {% for code, name in languages %}
+              <option value="{{ code }}" {% if lang == code %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-auto d-flex align-items-center">
+          <label for="sort_key" class="form-label me-2 fw-bold">排序：</label>
+          <select name="sort_key" id="sort_key" class="form-select form-select-sm w-auto rounded-pill border-0 shadow-sm me-2" style="background:#f0f4fa;" onchange="this.form.submit()">
+            <option value="code" {% if sort_key == 'code' %}selected{% endif %}>代码行数</option>
+            <option value="file_count" {% if sort_key == 'file_count' %}selected{% endif %}>文件数</option>
+          </select>
+          <select name="sort_order" id="sort_order" class="form-select form-select-sm w-auto rounded-pill border-0 shadow-sm" style="background:#f0f4fa;" onchange="this.form.submit()">
+            <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>降序</option>
+            <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>升序</option>
+          </select>
+        </div>
       </div>
     </form>
     <div class="text-center mb-4">
@@ -32,32 +45,97 @@
         <thead><tr>
           <th>{{ texts.folder if texts.folder else '目录' }}</th>
           <th>{{ texts.type if texts.type else '类型' }}</th>
-          <th>{{ texts.file_count if texts.file_count else '文件数' }}</th>
-          <th>{{ texts.total_lines if texts.total_lines else '总行数' }}</th>
-          <th>{{ texts.blank if texts.blank else '空行' }}</th>
-          <th>{{ texts.comment if texts.comment else '注释行' }}</th>
-          <th>{{ texts.code if texts.code else '代码行' }}</th>
+          <th>
+            <form method="post" action="/" style="display:inline;">
+              <input type="hidden" name="type" value="main">
+              <input type="hidden" name="project_path" value="{{ project_path }}">
+              <input type="hidden" name="sort_key" value="file_count">
+              <input type="hidden" name="sort_order" value="{% if sort_key == 'file_count' and sort_order == 'desc' %}asc{% else %}desc{% endif %}">
+              <input type="hidden" name="lang" value="{{ lang }}">
+              <button type="submit" class="btn p-0" style="background:none;border:none;box-shadow:none;text-decoration:none;">{{ texts.file_count if texts.file_count else '文件数' }}{% if sort_key == 'file_count' %} <span style="font-size:1em;">{% if sort_order == 'desc' %}&#9650;{% else %}&#9660;{% endif %}</span>{% endif %}</button>
+            </form>
+          </th>
+          <th>
+            <form method="post" action="/" style="display:inline;">
+              <input type="hidden" name="type" value="main">
+              <input type="hidden" name="project_path" value="{{ project_path }}">
+              <input type="hidden" name="sort_key" value="total_lines">
+              <input type="hidden" name="sort_order" value="{% if sort_key == 'total_lines' and sort_order == 'desc' %}asc{% else %}desc{% endif %}">
+              <input type="hidden" name="lang" value="{{ lang }}">
+              <button type="submit" class="btn p-0" style="background:none;border:none;box-shadow:none;text-decoration:none;">{{ texts.total_lines if texts.total_lines else '总行数' }}{% if sort_key == 'total_lines' %} <span style="font-size:1em;">{% if sort_order == 'desc' %}&#9650;{% else %}&#9660;{% endif %}</span>{% endif %}</button>
+            </form>
+          </th>
+          <th>
+            <form method="post" action="/" style="display:inline;">
+              <input type="hidden" name="type" value="main">
+              <input type="hidden" name="project_path" value="{{ project_path }}">
+              <input type="hidden" name="sort_key" value="blank">
+              <input type="hidden" name="sort_order" value="{% if sort_key == 'blank' and sort_order == 'desc' %}asc{% else %}desc{% endif %}">
+              <input type="hidden" name="lang" value="{{ lang }}">
+              <button type="submit" class="btn p-0" style="background:none;border:none;box-shadow:none;text-decoration:none;">{{ texts.blank if texts.blank else '空行' }}{% if sort_key == 'blank' %} <span style="font-size:1em;">{% if sort_order == 'desc' %}&#9650;{% else %}&#9660;{% endif %}</span>{% endif %}</button>
+            </form>
+          </th>
+          <th>
+            <form method="post" action="/" style="display:inline;">
+              <input type="hidden" name="type" value="main">
+              <input type="hidden" name="project_path" value="{{ project_path }}">
+              <input type="hidden" name="sort_key" value="comment">
+              <input type="hidden" name="sort_order" value="{% if sort_key == 'comment' and sort_order == 'desc' %}asc{% else %}desc{% endif %}">
+              <input type="hidden" name="lang" value="{{ lang }}">
+              <button type="submit" class="btn p-0" style="background:none;border:none;box-shadow:none;text-decoration:none;">{{ texts.comment if texts.comment else '注释行' }}{% if sort_key == 'comment' %} <span style="font-size:1em;">{% if sort_order == 'desc' %}&#9650;{% else %}&#9660;{% endif %}</span>{% endif %}</button>
+            </form>
+          </th>
+          <th>
+            <form method="post" action="/" style="display:inline;">
+              <input type="hidden" name="type" value="main">
+              <input type="hidden" name="project_path" value="{{ project_path }}">
+              <input type="hidden" name="sort_key" value="code">
+              <input type="hidden" name="sort_order" value="{% if sort_key == 'code' and sort_order == 'desc' %}asc{% else %}desc{% endif %}">
+              <input type="hidden" name="lang" value="{{ lang }}">
+              <button type="submit" class="btn p-0" style="background:none;border:none;box-shadow:none;text-decoration:none;">{{ texts.code if texts.code else '代码行' }}{% if sort_key == 'code' %} <span style="font-size:1em;">{% if sort_order == 'desc' %}&#9650;{% else %}&#9660;{% endif %}</span>{% endif %}</button>
+            </form>
+          </th>
         </tr></thead>
         <tbody>
         {% for folder in main_results %}
             {% set indent = folder.rel_path.count('/') %}
-            {% for ext, s in folder.stats.items() if s.files > 0 %}
-            <tr>
+            <tr data-bs-toggle="collapse" data-bs-target="#main-detail-{{ loop.index }}" aria-expanded="false" aria-controls="main-detail-{{ loop.index }}" style="cursor:pointer;">
                 <td>
                   {% if indent > 0 %}
-                    <span class="tree-indent" style="width:{{ (indent*1.5)|float }}em;"></span>{{ folder.name }}
+                    <span class="tree-indent" style="width:{{ (indent*1.5)|float }}em;"></span><span style="text-decoration:underline;">{{ folder.name }}</span>
                   {% else %}
-                    {{ folder.name }}
+                    <span style="text-decoration:underline;">{{ folder.name }}</span>
                   {% endif %}
                 </td>
-                <td>{{ ext }}</td>
-                <td>{{ s.files }}</td>
-                <td>{{ s.lines }}</td>
-                <td>{{ s.blank }}</td>
-                <td>{{ s.comment }}</td>
-                <td>{{ s.code }}</td>
+                <td>-</td>
+                <td>{{ folder.file_count }}</td>
+                <td>{{ folder.total_lines }}</td>
+                <td>{{ folder.blank }}</td>
+                <td>{{ folder.comment }}</td>
+                <td>{{ folder.code }}</td>
             </tr>
-            {% endfor %}
+            <tr class="collapse bg-light" id="main-detail-{{ loop.index }}">
+                <td colspan="7">
+                  <b>详情：</b>
+                  <table class="table table-bordered table-sm mb-0">
+                    <thead><tr>
+                      <th>类型</th><th>文件数</th><th>总行数</th><th>空行</th><th>注释行</th><th>代码行</th>
+                    </tr></thead>
+                    <tbody>
+                      {% for ext, s in folder.stats.items() if s.files > 0 %}
+                        <tr>
+                          <td>{{ ext }}</td>
+                          <td>{{ s.files }}</td>
+                          <td>{{ s.lines }}</td>
+                          <td>{{ s.blank }}</td>
+                          <td>{{ s.comment }}</td>
+                          <td>{{ s.code }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
@@ -67,25 +145,90 @@
         <thead><tr>
           <th>{{ texts.pod_name if texts.pod_name else '库名' }}</th>
           <th>{{ texts.type if texts.type else '类型' }}</th>
-          <th>{{ texts.file_count if texts.file_count else '文件数' }}</th>
-          <th>{{ texts.total_lines if texts.total_lines else '总行数' }}</th>
-          <th>{{ texts.blank if texts.blank else '空行' }}</th>
-          <th>{{ texts.comment if texts.comment else '注释行' }}</th>
-          <th>{{ texts.code if texts.code else '代码行' }}</th>
+          <th>
+            <form method="post" action="/" style="display:inline;">
+              <input type="hidden" name="type" value="pod">
+              <input type="hidden" name="project_path" value="{{ project_path }}">
+              <input type="hidden" name="sort_key" value="file_count">
+              <input type="hidden" name="sort_order" value="{% if sort_key == 'file_count' and sort_order == 'desc' %}asc{% else %}desc{% endif %}">
+              <input type="hidden" name="lang" value="{{ lang }}">
+              <button type="submit" class="btn p-0" style="background:none;border:none;box-shadow:none;text-decoration:none;">{{ texts.file_count if texts.file_count else '文件数' }}{% if sort_key == 'file_count' %} <span style="font-size:1em;">{% if sort_order == 'desc' %}&#9650;{% else %}&#9660;{% endif %}</span>{% endif %}</button>
+            </form>
+          </th>
+          <th>
+            <form method="post" action="/" style="display:inline;">
+              <input type="hidden" name="type" value="pod">
+              <input type="hidden" name="project_path" value="{{ project_path }}">
+              <input type="hidden" name="sort_key" value="total_lines">
+              <input type="hidden" name="sort_order" value="{% if sort_key == 'total_lines' and sort_order == 'desc' %}asc{% else %}desc{% endif %}">
+              <input type="hidden" name="lang" value="{{ lang }}">
+              <button type="submit" class="btn p-0" style="background:none;border:none;box-shadow:none;text-decoration:none;">{{ texts.total_lines if texts.total_lines else '总行数' }}{% if sort_key == 'total_lines' %} <span style="font-size:1em;">{% if sort_order == 'desc' %}&#9650;{% else %}&#9660;{% endif %}</span>{% endif %}</button>
+            </form>
+          </th>
+          <th>
+            <form method="post" action="/" style="display:inline;">
+              <input type="hidden" name="type" value="pod">
+              <input type="hidden" name="project_path" value="{{ project_path }}">
+              <input type="hidden" name="sort_key" value="blank">
+              <input type="hidden" name="sort_order" value="{% if sort_key == 'blank' and sort_order == 'desc' %}asc{% else %}desc{% endif %}">
+              <input type="hidden" name="lang" value="{{ lang }}">
+              <button type="submit" class="btn p-0" style="background:none;border:none;box-shadow:none;text-decoration:none;">{{ texts.blank if texts.blank else '空行' }}{% if sort_key == 'blank' %} <span style="font-size:1em;">{% if sort_order == 'desc' %}&#9650;{% else %}&#9660;{% endif %}</span>{% endif %}</button>
+            </form>
+          </th>
+          <th>
+            <form method="post" action="/" style="display:inline;">
+              <input type="hidden" name="type" value="pod">
+              <input type="hidden" name="project_path" value="{{ project_path }}">
+              <input type="hidden" name="sort_key" value="comment">
+              <input type="hidden" name="sort_order" value="{% if sort_key == 'comment' and sort_order == 'desc' %}asc{% else %}desc{% endif %}">
+              <input type="hidden" name="lang" value="{{ lang }}">
+              <button type="submit" class="btn p-0" style="background:none;border:none;box-shadow:none;text-decoration:none;">{{ texts.comment if texts.comment else '注释行' }}{% if sort_key == 'comment' %} <span style="font-size:1em;">{% if sort_order == 'desc' %}&#9650;{% else %}&#9660;{% endif %}</span>{% endif %}</button>
+            </form>
+          </th>
+          <th>
+            <form method="post" action="/" style="display:inline;">
+              <input type="hidden" name="type" value="pod">
+              <input type="hidden" name="project_path" value="{{ project_path }}">
+              <input type="hidden" name="sort_key" value="code">
+              <input type="hidden" name="sort_order" value="{% if sort_key == 'code' and sort_order == 'desc' %}asc{% else %}desc{% endif %}">
+              <input type="hidden" name="lang" value="{{ lang }}">
+              <button type="submit" class="btn p-0" style="background:none;border:none;box-shadow:none;text-decoration:none;">{{ texts.code if texts.code else '代码行' }}{% if sort_key == 'code' %} <span style="font-size:1em;">{% if sort_order == 'desc' %}&#9650;{% else %}&#9660;{% endif %}</span>{% endif %}</button>
+            </form>
+          </th>
         </tr></thead>
         <tbody>
         {% for pod in pod_results %}
-            {% for ext, s in pod.stats.items() if s.files > 0 %}
-            <tr>
-                <td>{{ pod.name }}</td>
-                <td>{{ ext }}</td>
-                <td>{{ s.files }}</td>
-                <td>{{ s.lines }}</td>
-                <td>{{ s.blank }}</td>
-                <td>{{ s.comment }}</td>
-                <td>{{ s.code }}</td>
+            <tr data-bs-toggle="collapse" data-bs-target="#pod-detail-{{ loop.index }}" aria-expanded="false" aria-controls="pod-detail-{{ loop.index }}" style="cursor:pointer;">
+                <td><span style="text-decoration:underline;">{{ pod.name }}</span></td>
+                <td>-</td>
+                <td>{{ pod.file_count }}</td>
+                <td>{{ pod.total_lines }}</td>
+                <td>{{ pod.blank }}</td>
+                <td>{{ pod.comment }}</td>
+                <td>{{ pod.code }}</td>
             </tr>
-            {% endfor %}
+            <tr class="collapse bg-light" id="pod-detail-{{ loop.index }}">
+                <td colspan="7">
+                  <b>详情：</b>
+                  <table class="table table-bordered table-sm mb-0">
+                    <thead><tr>
+                      <th>类型</th><th>文件数</th><th>总行数</th><th>空行</th><th>注释行</th><th>代码行</th>
+                    </tr></thead>
+                    <tbody>
+                      {% for ext, s in pod.stats.items() %}
+                        <tr>
+                          <td>{{ ext }}</td>
+                          <td>{{ s.files }}</td>
+                          <td>{{ s.lines }}</td>
+                          <td>{{ s.blank }}</td>
+                          <td>{{ s.comment }}</td>
+                          <td>{{ s.code }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
@@ -98,5 +241,6 @@
     <a href="/" class="btn btn-primary mt-3 rounded-pill shadow fw-bold" style="background: linear-gradient(90deg,#6a93cb,#a4bfef); border:none;">{{ texts.back if texts.back else '返回' }}</a>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
