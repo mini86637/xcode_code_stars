@@ -1,0 +1,30 @@
+{
+  "name": "xcode-code-stats-electron",
+  "version": "1.0.0",
+  "main": "main.js",
+  "description": "Xcode代码统计桌面版 (Electron+Flask)",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.6.0"
+  },
+  "build": {
+    "appId": "com.xcode.codestats",
+    "productName": "Xcode代码统计",
+    "directories": {
+      "buildResources": "build"
+    },
+    "files": [
+      "**/*"
+    ],
+    "mac": {
+      "icon": "build/icon.icns"
+    },
+    "win": {
+      "icon": "build/icon.ico"
+    }
+  }
+}

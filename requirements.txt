@@ -1,0 +1,4 @@
+Flask>=2.2.0
+Werkzeug>=2.2.0
+Bootstrap-Flask>=2.0.0
+Jinja2>=3.0.0

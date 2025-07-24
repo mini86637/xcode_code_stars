@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.env
+*.sqlite3
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Node
+electron-app/node_modules/
+electron-app/dist/
+node_modules/
+dist/
+
+# Logs
+*.log
+
+# Others
+*.swp
+*.swo

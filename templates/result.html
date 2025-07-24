@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>统计结果 - Xcode代码统计</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Xcode 项目统计结果</h2>
+    <p><b>项目路径：</b>{{ project_path }}</p>
+    <h4 class="mt-4">主项目各目录统计</h4>
+    <style>
+    .tree-indent { display: inline-block; }
+    </style>
+    <table class="table table-bordered table-sm">
+        <thead><tr><th>目录</th><th>类型</th><th>文件数</th><th>总行数</th><th>空行</th><th>注释行</th><th>代码行</th></tr></thead>
+        <tbody>
+        {% for folder in main_results %}
+            {% set indent = folder.rel_path.count('/') %}
+            {% for ext, s in folder.stats.items() if s.files > 0 %}
+            <tr>
+                <td>
+                  {% if indent > 0 %}
+                    <span class="tree-indent" style="width:{{ (indent*1.5)|float }}em;"></span>{{ folder.name }}
+                  {% else %}
+                    {{ folder.name }}
+                  {% endif %}
+                </td>
+                <td>{{ ext }}</td>
+                <td>{{ s.files }}</td>
+                <td>{{ s.lines }}</td>
+                <td>{{ s.blank }}</td>
+                <td>{{ s.comment }}</td>
+                <td>{{ s.code }}</td>
+            </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+    <h5>主项目总代码行数：{{ main_total }}</h5>
+    <h4 class="mt-4">Pod（三方库）各库统计</h4>
+    <table class="table table-bordered table-sm">
+        <thead><tr><th>库名</th><th>类型</th><th>文件数</th><th>总行数</th><th>空行</th><th>注释行</th><th>代码行</th></tr></thead>
+        <tbody>
+        {% for pod in pod_results %}
+            {% for ext, s in pod.stats.items() if s.files > 0 %}
+            <tr>
+                <td>{{ pod.name }}</td>
+                <td>{{ ext }}</td>
+                <td>{{ s.files }}</td>
+                <td>{{ s.lines }}</td>
+                <td>{{ s.blank }}</td>
+                <td>{{ s.comment }}</td>
+                <td>{{ s.code }}</td>
+            </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+    <h5>Pod总代码行数：{{ pod_total }}</h5>
+    <h4 class="mt-4">占比</h4>
+    <ul>
+        <li>主项目占比：{{ '%.2f' % (main_total / total_code * 100) if total_code else 0 }}%</li>
+        <li>Pod（三方库）占比：{{ '%.2f' % (pod_total / total_code * 100) if total_code else 0 }}%</li>
+    </ul>
+    <a href="/" class="btn btn-secondary mt-3">返回</a>
+</div>
+</body>
+</html>
